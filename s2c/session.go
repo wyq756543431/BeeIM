@@ -68,6 +68,7 @@ func CreateSession(conn net.Conn) *Session {
 		packetReader:   packetReader,
 		packetWriter:   packetWriter,
 	}
+	log.Printf("创建session %+v\n",Session)
 	Session.Listen()
 	return Session
 }
@@ -86,6 +87,7 @@ func (self *Session) Read() {
 	for {
 		if packet,err := self.packetReader.ReadAPacket();err == nil {
 //			self.incoming <- *packet
+			log.Printf("放入返回通道%+v",packet)
 			self.outgoing <- *packet
 		}else{
 			log.Println("Read error:",err)
@@ -98,7 +100,6 @@ func (self *Session) Read() {
 func (self *Session) Write() {
 
 	for packet := range self.outgoing {
-
 		if err := self.packetWriter.WriteAPacket(&packet);err != nil {
 			log.Println("Write a packet error:",err)
 			self.quit()

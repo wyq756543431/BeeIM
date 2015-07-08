@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"errors"
+	"github.com/go-xweb/log"
 )
 
 /*
@@ -50,7 +51,7 @@ func NewPacketReader(rd io.Reader) *PacketReader {
 func (r *PacketReader) checkPacketHat() (bool, error) {
 
 	//read 4 bytes from bufio.reader
-	for v := range PacketHat {
+	for _,v := range PacketHat {
 		b ,err := r.br.ReadByte()
 
 		if err != nil {
@@ -141,7 +142,6 @@ func (r *PacketReader) ReadAPacket() (packet *Packet, err error) {
 
 	//check packet hat
 	hasHat, err := r.checkPacketHat()
-
 	if (!hasHat) {
 		return nil, ErrInvalidPacketHat
 	}
@@ -168,14 +168,13 @@ func (r *PacketReader) ReadAPacket() (packet *Packet, err error) {
 
 	//alloc packet data buffer
 	packetData := make([]byte, packetLength)
-
+	packet.SetData(packetData)
 	//read packet data
 	err = r.readPacketData(packetData)
-
 	if err != nil {
 		return nil, err
 	}
-
+	log.Printf("收到的数据包-->%+v",packet)
 	return packet, nil
 }
 
