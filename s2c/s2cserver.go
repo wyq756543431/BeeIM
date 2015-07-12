@@ -3,7 +3,7 @@ package s2c
 import (
 	"net"
 	"log"
-	"github.com/jaydenhe/BeeIM/uitl/uniq"
+	"github.com/wyq756543431/BeeIM/uitl/uniq"
 )
 
 const (
@@ -101,7 +101,7 @@ func (self *Server) join(conn net.Conn) {
 	id := TypeSessionID(uniq.GetUniq())
 	session.SetID(id)
 	self.sessions[id] = session
-
+	log.Printf("session:%+v",session)
 	go func() {
 		<-session.quiting
 		delete(self.sessions, session.GetID())

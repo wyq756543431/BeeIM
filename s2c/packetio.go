@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"errors"
+	"hash/crc32"
 	"github.com/go-xweb/log"
 )
 
@@ -29,6 +30,7 @@ const (
 var (
 	ErrInvalidPacketHat    = errors.New("pakcetio:Invalid PacketHat")
 	ErrInvalidPacketLength = errors.New("packetio:invalid Packet length")
+	ErrInvalidPacketSumIEEE=errors.New("packetio:Invalid Packet sumIEEE")
 )
 
 var (
@@ -63,8 +65,29 @@ func (r *PacketReader) checkPacketHat() (bool, error) {
 		}
 
 	}
-
 	return true, nil
+}
+
+func (r *PacketReader) checkDataSumIEEE(data []byte) error {
+	bufCRC := make([]byte, 4)
+	hasRead := int(0)
+	for {
+		n, err := r.br.Read(bufCRC[hasRead:])
+		if err != nil {
+			return err
+		}
+		hasRead += n
+		if hasRead >= len(bufCRC) {
+			break
+		}
+	}
+	bufCRC32 := binary.BigEndian.Uint32(bufCRC)
+	srcCRC := crc32.ChecksumIEEE(data)
+	if bufCRC32 != srcCRC {
+		return ErrInvalidPacketSumIEEE
+	}
+	return nil
+
 }
 
 //read packetType from io stream
@@ -168,13 +191,18 @@ func (r *PacketReader) ReadAPacket() (packet *Packet, err error) {
 
 	//alloc packet data buffer
 	packetData := make([]byte, packetLength)
-	packet.SetData(packetData)
 	//read packet data
 	err = r.readPacketData(packetData)
 	if err != nil {
 		return nil, err
 	}
+	packet.SetData(packetData)
 	log.Printf("收到的数据包-->%+v",packet)
+	err = r.checkDataSumIEEE(packetData)
+	if err != nil {
+		log.Println("read errors: %s", err)
+		return nil,err
+	}
 	return packet, nil
 }
 
@@ -199,27 +227,35 @@ func (w *PacketWriter) WriteAPacket(packet *Packet) (err error) {
 	if err != nil {
 		return err
 	}
-
+	log.Println("数据头",PacketHat)
 	//write packet type
 	binary.BigEndian.PutUint32(buf, packet.GetType())
 	_, err = w.bw.Write(buf)
 	if err != nil {
 		return err
 	}
-
+	log.Println("数据类型",buf)
 	//write packet length
 	binary.BigEndian.PutUint32(buf, uint32(len(packet.GetData())))
 	_, err = w.bw.Write(buf)
 	if err != nil {
 		return err
 	}
-
+	log.Println("数据长度",buf)
 	//write packet data
 	_, err = w.bw.Write(packet.GetData())
 	if err != nil {
 		return err
 	}
-
+	log.Println("数据体",packet.GetData())
+	//.....................写CRC32校验..........................
+	intCRC := crc32.ChecksumIEEE(packet.GetData())
+	binary.BigEndian.PutUint32(buf, intCRC)
+	_, err = w.bw.Write(buf)
+	if err != nil {
+		return err
+	}
+	log.Println("数据校验",buf)
 	return nil
 }
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"github.com/jaydenhe/BeeIM/s2c"
+	"github.com/wyq756543431/BeeIM/s2c"
 )
 
 func main(){
