@@ -54,7 +54,7 @@ func (self *Server) Start(connString string) {
 
 	self.listener = listener
 
-	log.Printf("Server %+v starts\n", self)
+	log.Println("Server start")
 
 	// filling the tokens
 	for i := 0; i < MAX_SESSIONS; i++ {
@@ -69,7 +69,7 @@ func (self *Server) Start(connString string) {
 			return
 		}
 
-		log.Printf("A new connection %v kicks\n", conn)
+		log.Printf("A new connection [ %+v ]\n", conn)
 
 		self.takeToken()
 		self.pending <- conn
@@ -97,11 +97,11 @@ func (self *Server) listen() {
 
 func (self *Server) join(conn net.Conn) {
 
-	session := CreateSession(conn)
+	session := CreateSession(self,conn)
 	id := TypeSessionID(uniq.GetUniq())
 	session.SetID(id)
 	self.sessions[id] = session
-	log.Printf("session:%+v",session)
+	log.Printf("join session:%+v",session)
 	go func() {
 		<-session.quiting
 		delete(self.sessions, session.GetID())

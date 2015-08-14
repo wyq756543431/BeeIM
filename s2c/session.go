@@ -26,6 +26,7 @@ type Session struct {
 	quiting  chan byte
 	name     string
 	id       TypeSessionID
+	server   *Server
 }
 
 func (self *Session) GetName() string {
@@ -56,7 +57,7 @@ func (self *Session) PutOutgoing(packet Packet) {
 	self.outgoing <- packet
 }
 
-func CreateSession(conn net.Conn) *Session {
+func CreateSession(server *Server,conn net.Conn) *Session {
 	packetReader := NewPacketReader(conn)
 	packetWriter := NewPacketWriter(conn)
 
@@ -67,8 +68,9 @@ func CreateSession(conn net.Conn) *Session {
 		quiting:  make(chan byte),
 		packetReader:   packetReader,
 		packetWriter:   packetWriter,
+		server:server,
 	}
-	log.Printf("创建session %+v\n",Session)
+	log.Printf("create session [ %+v ]\n",Session)
 	Session.Listen()
 	return Session
 }
@@ -86,9 +88,17 @@ func (self *Session) Read() {
 
 	for {
 		if packet,err := self.packetReader.ReadAPacket();err == nil {
-//			self.incoming <- *packet
-			log.Printf("放入返回通道%+v",packet)
-			self.outgoing <- *packet
+			log.Printf("放入进入信息通道%+v",packet)//暂存传入的信息 todo下一步查找要转发到得session
+			/*self.incoming <- *packet
+
+			////////////////////
+			prtn:=NewPacket()
+			prtn.SetType(PacketType_SendMsgRtn)
+			prtn.SetData([]byte("success"))
+			////////////////////
+			//查找转发对象
+			log.Printf("放入返回通道发送成功消息回复%+v",prtn)*/
+			self.outgoing <- *packet//目前直接返回请求的信息
 		}else{
 			log.Println("Read error:",err)
 			self.quit()
