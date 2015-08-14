@@ -4,7 +4,7 @@ author:jaydenhe
 package s2c
 
 import (
-	"log"
+	"github.com/go-xweb/log"
 	"net"
 )
 

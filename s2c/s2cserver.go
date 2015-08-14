@@ -2,7 +2,7 @@ package s2c
 
 import (
 	"net"
-	"log"
+	"github.com/go-xweb/log"
 	"github.com/wyq756543431/BeeIM/uitl/uniq"
 )
 
@@ -54,7 +54,7 @@ func (self *Server) Start(connString string) {
 
 	self.listener = listener
 
-	log.Printf("Server %p starts\n", self)
+	log.Printf("Server %+v starts\n", self)
 
 	// filling the tokens
 	for i := 0; i < MAX_SESSIONS; i++ {

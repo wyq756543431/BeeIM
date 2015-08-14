@@ -1,10 +1,16 @@
 package s2c
 
-import (
+import ()
 
+const (
+	PacketType_GetLoginToken = iota //获取登陆令牌
+	PacketType_Login                //登陆
+	PacketType_GetFList				//得到好友列表
+	PacketType_SendMsg              //发送信息
+	PacketType_Quit                 //退出
 )
 
-type Packet struct{
+type Packet struct {
 	packetType uint32
 	packetData []byte
 }
@@ -29,4 +35,3 @@ func (self *Packet) SetData(data []byte) {
 func (self *Packet) GetData() (data []byte) {
 	return self.packetData
 }
-
