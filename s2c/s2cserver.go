@@ -69,7 +69,7 @@ func (self *Server) Start(connString string) {
 			return
 		}
 
-		log.Printf("A new connection [ %+v ]\n", conn)
+		log.Printf("A new connection [ %+v ]  %s\n", conn,conn.RemoteAddr().String())
 
 		self.takeToken()
 		self.pending <- conn

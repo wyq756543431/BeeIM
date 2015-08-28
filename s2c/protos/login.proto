@@ -1,5 +1,6 @@
-package protocol;
-
+syntax = "proto2";
+//protoc --go_out=. login.proto
+package protos;
 message LoginReq {
     required string MessageFrom = 1;
     required string MessageTo = 2;
