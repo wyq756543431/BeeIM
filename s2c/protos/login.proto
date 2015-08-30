@@ -8,7 +8,7 @@ message LoginReq {
     optional string UserPass = 4;
 }
 
-message LoginAck {
+message LoginRes {
     required string MessageFrom = 1;
     required string MessageTo = 2;
     optional string Result = 3;

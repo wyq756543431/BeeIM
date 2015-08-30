@@ -12,7 +12,7 @@ It is generated from these files:
 
 It has these top-level messages:
 	LoginReq
-	LoginAck
+	LoginRes
 */
 package protos
 
@@ -65,32 +65,32 @@ func (m *LoginReq) GetUserPass() string {
 	return ""
 }
 
-type LoginAck struct {
+type LoginRes struct {
 	MessageFrom      *string `protobuf:"bytes,1,req" json:"MessageFrom,omitempty"`
 	MessageTo        *string `protobuf:"bytes,2,req" json:"MessageTo,omitempty"`
 	Result           *string `protobuf:"bytes,3,opt" json:"Result,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *LoginAck) Reset()         { *m = LoginAck{} }
-func (m *LoginAck) String() string { return proto.CompactTextString(m) }
-func (*LoginAck) ProtoMessage()    {}
+func (m *LoginRes) Reset()         { *m = LoginRes{} }
+func (m *LoginRes) String() string { return proto.CompactTextString(m) }
+func (*LoginRes) ProtoMessage()    {}
 
-func (m *LoginAck) GetMessageFrom() string {
+func (m *LoginRes) GetMessageFrom() string {
 	if m != nil && m.MessageFrom != nil {
 		return *m.MessageFrom
 	}
 	return ""
 }
 
-func (m *LoginAck) GetMessageTo() string {
+func (m *LoginRes) GetMessageTo() string {
 	if m != nil && m.MessageTo != nil {
 		return *m.MessageTo
 	}
 	return ""
 }
 
-func (m *LoginAck) GetResult() string {
+func (m *LoginRes) GetResult() string {
 	if m != nil && m.Result != nil {
 		return *m.Result
 	}

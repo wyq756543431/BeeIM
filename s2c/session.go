@@ -71,13 +71,14 @@ func CreateSession(server *Server,conn net.Conn) *Session {
 		server:server,
 	}
 	log.Printf("create session [ %+v ]\n",Session)
-	Session.Listen()
+	Session.Listen(server)
 	return Session
 }
 
-func (self *Session) Listen() {
+func (self *Session) Listen(server *Server) {
 	go self.Read()
 	go self.Write()
+	go self.Forward(server)
 }
 
 func (self *Session) quit() {
@@ -88,17 +89,8 @@ func (self *Session) Read() {
 
 	for {
 		if packet,err := self.packetReader.ReadAPacket();err == nil {
-			log.Printf("放入进入信息通道%+v",packet)//暂存传入的信息 todo下一步查找要转发到得session
-			/*self.incoming <- *packet
-
-			////////////////////
-			prtn:=NewPacket()
-			prtn.SetType(PacketType_SendMsgRtn)
-			prtn.SetData([]byte("success"))
-			////////////////////
-			//查找转发对象
-			log.Printf("放入返回通道发送成功消息回复%+v",prtn)*/
-			self.outgoing <- *packet//目前直接返回请求的信息
+			log.Printf("放入进入信息通道%+v",packet)
+			self.incoming <- *packet
 		}else{
 			log.Println("Read error:",err)
 			self.quit()
@@ -121,6 +113,15 @@ func (self *Session) Write() {
 			self.quit()
 			return
 		}
+	}
+
+}
+
+
+func (self *Session) Forward(server *Server) {
+	for packet := range self.incoming {
+		log.Printf("转发%+v \n",packet)
+		self.outgoing <- packet
 	}
 
 }
