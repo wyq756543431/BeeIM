@@ -1,15 +1,15 @@
 syntax = "proto2";
 //protoc --go_out=. login.proto
 package protos;
-message LoginReq {
-    required string MessageFrom = 1;
-    required string MessageTo = 2;
-    optional string CryptoKey = 3;
-    optional string UserPass = 4;
+
+message Login {
+    optional string ClientType=1;
+    required string userName=2;
+    required string passWord=3;
 }
 
-message LoginRes {
-    required string MessageFrom = 1;
-    required string MessageTo = 2;
-    optional string Result = 3;
+message LoginRtn {
+    required string Status = 1;
+    optional string Msg=2;
+    optional string TokenId = 3;
 }

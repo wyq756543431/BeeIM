@@ -1,17 +1,21 @@
 package uniq
 
+import (
+	uuid "github.com/satori/go.uuid"
+)
 var (
-	num = make(chan uint64)
+	num = make(chan uuid.UUID)
 )
 
 func init() {
 	go func() {
-		for i := uint64(0); ; i++ {
-			num <- i
+		for {
+			uuid:=uuid.NewV4()
+			num <- uuid
 		}
 	}()
 }
 
-func GetUniq() uint64 {
+func GetUniq() uuid.UUID {
 	return <-num
 }

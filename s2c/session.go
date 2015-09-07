@@ -5,6 +5,7 @@ package s2c
 
 import (
 	"github.com/go-xweb/log"
+	uuid "github.com/satori/go.uuid"
 	"net"
 )
 
@@ -15,7 +16,7 @@ SessionID 64bit
 
 SessionID = uid<<32 + extendId
  */
-type TypeSessionID uint64
+type TypeSessionID uuid.UUID
 
 type Session struct {
 	conn     net.Conn
@@ -78,7 +79,6 @@ func CreateSession(server *Server,conn net.Conn) *Session {
 func (self *Session) Listen(server *Server) {
 	go self.Read()
 	go self.Write()
-	go self.Forward(server)
 }
 
 func (self *Session) quit() {
@@ -113,15 +113,6 @@ func (self *Session) Write() {
 			self.quit()
 			return
 		}
-	}
-
-}
-
-
-func (self *Session) Forward(server *Server) {
-	for packet := range self.incoming {
-		log.Printf("转发%+v \n",packet)
-		self.outgoing <- packet
 	}
 
 }
